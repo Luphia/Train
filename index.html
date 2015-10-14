@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Travel on the rail</title>
+        <style media="screen">
+            body {
+                overflow: hidden;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            img {
+                width: 100%;
+                height: 100%;
+            }
+
+            /* 過山洞 */
+
+            /* 說話 */
+            @-webkit-keyframes say {
+                0% {
+                    -webkit-transform: matrix(2, 0, 0, 2, 0, 0);
+                }
+                20% {
+                    -webkit-transform: matrix(1.5, 1, 0, 1.5, 0, 0);
+                }
+                40% {
+                    -webkit-transform: matrix(1, 0, 1, 1, 0, -1);
+                }
+                60% {
+                    -webkit-transform: matrix(1, -1, 0, 1, 1, 0);
+                }
+                80% {
+                    -webkit-transform: matrix(1, 0, 0, 1, 0, 1);
+                }
+                100% {
+                    -webkit-transform: matrix(1, 0, 0, 1, 0, 0);
+                }
+            }
+
+            /* 跌倒 */
+            @-webkit-keyframes fallingDown {
+                0% {
+
+                }
+                50% {
+
+                }
+                80% {
+
+                }
+                90% {
+
+                }
+                100% {
+
+                }
+            }
+
+            /* 景色前進 */
+            @-webkit-keyframes foward {
+                0% {
+                    -webkit-transform: translateX(-100px);
+                    -webkit-filter: brightness(1);
+                }
+                50% {
+                    -webkit-filter: brightness(2);
+                }
+                100% {
+                    -webkit-transform: translateX(100px);
+                    -webkit-filter: brightness(1);
+                }
+            }
+
+            /* 火車晃動 */
+            @-webkit-keyframes shake {
+                0%, 100% {
+                    -webkit-transform: translateY(-10px);
+                }
+                10%, 90% {
+                    -webkit-transform: translateY(0px);
+                }
+                50% {
+                    -webkit-transform: translateY(5px);
+                }
+
+                20% {
+                    -webkit-transform: translateX(-10px);
+                }
+                80% {
+                    -webkit-transform: translateX(10px);
+                }
+            }
+
+            canvas {
+                -webkit-animation-name: shake;
+                -webkit-animation-duration: 10s;
+                -webkit-transform-origin: 50% 50%;
+                -webkit-animation-iteration-count: infinite;
+                -webkit-animation-timing-function: linear;
+            }
+
+            div.train {
+                display: block;
+                position: fixed;
+                top: 0px;
+                left: 0px;
+                width: 100%;
+                height: 100%;
+                -webkit-animation-name: shake;
+                -webkit-animation-duration: 1.5s;
+                -webkit-transform-origin: 50% 50%;
+                -webkit-animation-iteration-count: infinite;
+                -webkit-animation-timing-function: linear;
+            }
+            div.window {
+                display: block;
+                width: 100%;
+                height: 100%;
+            }
+            div.frame {
+                display: block;
+                width: 120%;
+                height: 120%;
+                box-shadow: 0 -50px 100px 150px rgba(0, 0, 0, .8) inset;
+                position: absolute;
+                top: -10%;
+                left: -10%;
+            }
+            div.stage {
+                display: block;
+                width: 100%;
+                height: 30px;
+                color: rgba(255, 255, 255, .3);
+                background: rgba(255, 235, 215, .15);
+                text-align: center;
+                line-height: 2em;
+                position: fixed;
+                bottom: -10px;
+                left: 0px;
+            }
+            div.stage::before {
+                content: "";
+                display: block;
+                border-top: 0px solid transparent;
+                border-bottom: 50px solid rgba(255, 235, 215, .2);
+                border-left: 80px solid transparent;
+                border-right: 80px solid transparent;
+                margin-top: -50px;
+            }
+            div.item {
+                display: none;
+                min-width: 150px;
+                min-height: 150px;
+                background: url(./images/item.png) no-repeat;
+                position: absolute;
+                right: 50px;
+                bottom: 50px;
+                -webkit-filter: sepia(30%) brightness(80%) contrast(150%);
+            }
+            div.item > div.box {
+                display: block;
+                position: absolute;
+                padding: 20px;
+                margin-left: -150px;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, .5);
+                color: #fff;
+
+                -webkit-animation-name: say;
+                -webkit-animation-duration: 1s;
+                -webkit-transform-origin: 50% 50%;
+                -webkit-animation-timing-function: linear;
+            }
+            div.item > div.box::after {
+                content: "";
+                position: absolute;
+                margin-left: 13px;
+                margin-top: 30px;
+                border-top: 5px solid transparent;
+                border-bottom: 5px solid transparent;
+                border-left: 15px solid rgba(255, 255, 255, .5);
+                border-right: 0px solid rgba(255, 255, 255, .5);
+                -webkit-transform: rotate(10deg) skewX(-30deg);
+            }
+        </style>
+        <script src="rainyday.js"></script>
+        <script>
+            var engine;
+            function run() {
+                var image = document.getElementById('background');
+                image.onload = function() {
+                    engine = new RainyDay({
+                        image: this,
+                        gravityAngle: Math.PI / 9,
+                    });
+                    engine.trail = engine.TRAIL_SMUDGE;
+                    engine.rain([ [1, 0, 50], [3, 3, 1] ], 100);
+                };
+                image.crossOrigin = 'anonymous';
+                image.src = './images/view.jpg';
+
+                var audio = document.getElementsByTagName('audio');
+                audio[0].play();
+                audio[1].volume = 0.8
+                audio[1].play();
+
+                audio[0].addEventListener('timeupdate', function(e){
+                    if(this.currentTime > 11.5) {
+                        this.currentTime = 1;
+                    }
+                }, false);
+                audio[1].addEventListener('ended', function(e){
+                    this.currentTime = 0;
+                    this.play();
+                }, false);
+            }
+        </script>
+    </head>
+    <body onload="run();">
+        <audio controls preload="true" style="display:none;"><source src="./resource/train.mp3" type="audio/mp3" /></audio>
+        <audio controls preload="true" style="display:none;"><source src="./resource/rain.ogg" type="audio/ogg" /></audio>
+        <img id="background" alt="background" src="" />
+        <div class="train">
+            <div class="topic">
+                <div class="title"></div>
+                <div class="subtitle"></div>
+                <div class="content"></div>
+            </div>
+
+            <div class="frame"></div>
+            <div class="stage">
+                <div class="item">
+                    <div class="box">鴨川到着する</div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
